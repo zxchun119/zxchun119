@@ -1,0 +1,60 @@
+//封装 ajax网络请求函数
+function AJAX(obj){
+    //第一步创建ajax对象
+    var ajaxObj = null;
+    //兼容性判断
+    if (window.XMLHttpRequest) {
+            //标准浏览器
+           ajaxObj = new XMLHttpRequest();
+    }else{
+           //非标准浏览器
+        ajaxObj = new ActiveXObject("Microsoft.XMLHttp");
+    }
+    //设置请求的类型,(没填默认设值get),转换大小写obj.type.toUpperCase()  
+    obj.type =obj.type.toUpperCase() || "GET";
+    //如果是get请求,并且需要传递参数,则需要给 url后面拼接参数
+    if (obj.type == "GET") {
+         var arr = [];//顶一个数组,用于把对象储存到数组数据里面
+         for (var key in obj.data) {
+            arr.push(key+"="+obj.data[key]);
+      };
+      //用&分割数组,让其转化为类似:name:gxm&age=18的形式
+       var str = arr.join("&");
+       obj.url = obj.url+"?"+str;//让原来的URL转换成
+       //拨号
+       ajaxObj.open(obj.type,obj.url,true);
+       console.log(str);
+
+      //发送"name=123&dad=131"
+
+      ajaxObj.send();
+
+    }else{
+           var arr = [];//顶一个数组,用于把对象储存到数组数据里面
+         for (var key in obj.data) {
+         arr.push(key + "=" + obj.data[key]);
+      }
+       var str = arr.join("&");
+       ajaxObj.open(obj.type,obj.url,true);
+       ajaxObj.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+       //发送"name=123&dad=131"
+
+       ajaxObj.send(str);
+
+    }
+   //监听
+   ajaxObj.onreadystatechange = function(){
+        if (ajaxObj.readyState == 4) {
+
+            if(ajaxObj.status >= 200 && ajaxObj.status < 300 || ajaxObj.status == 304){
+
+                obj.success(ajaxObj.responseText);
+               // console.log(ajaxObj.responseText);
+            }else{
+             //请求失败
+             obj.error(ajaxObj.status);
+            }
+        };
+   }
+}
+ 
